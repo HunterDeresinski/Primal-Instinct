@@ -1,5 +1,6 @@
 package net.neophantum.primalinstinct;
 
+import net.neophantum.primalinstinct.item.ModItems;
 import org.slf4j.Logger;
 
 import com.mojang.logging.LogUtils;
@@ -47,6 +48,8 @@ public class PrimalInstinct {
         // Register non-static event handler classes (if any)
         NeoForge.EVENT_BUS.register(this);
 
+        ModItems.register(modEventBus);
+
         // Register static client-side event handlers
         modEventBus.register(ClientModEvents.class);
 
@@ -58,7 +61,10 @@ public class PrimalInstinct {
     }
 
     private void addCreative(BuildCreativeModeTabContentsEvent event) {
-        // Creative tab item registration
+        if(event.getTabKey() == CreativeModeTabs.INGREDIENTS) {
+            event.accept(ModItems.KHAORITE);
+            event.accept(ModItems.RAW_KHAORITE);
+        }
     }
 
     @SubscribeEvent
