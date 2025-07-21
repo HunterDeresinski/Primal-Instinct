@@ -1,4 +1,9 @@
 {
   "item.primalinstinct.khaorite": "Khaorite",
-  "item.primalinstinct.raw_khaorite": "Raw Khaorite"
+  "item.primalinstinct.raw_khaorite": "Raw Khaorite",
+
+  "block.primalinstinct.khaorite_block": "Block of Khaorite",
+  "block.primalinstinct.khaorite_ore": "Khaorite Ore",
+
+  "creativetab.primalinstinct.primal_instinct_items": "Primal Instinct"
 }

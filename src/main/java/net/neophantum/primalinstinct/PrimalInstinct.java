@@ -1,5 +1,7 @@
 package net.neophantum.primalinstinct;
 
+import net.neophantum.primalinstinct.block.ModBlocks;
+import net.neophantum.primalinstinct.item.ModCreativeModeTabs;
 import net.neophantum.primalinstinct.item.ModItems;
 import org.slf4j.Logger;
 
@@ -48,7 +50,10 @@ public class PrimalInstinct {
         // Register non-static event handler classes (if any)
         NeoForge.EVENT_BUS.register(this);
 
+        ModCreativeModeTabs.register(modEventBus);
+
         ModItems.register(modEventBus);
+        ModBlocks.register(modEventBus);
 
         // Register static client-side event handlers
         modEventBus.register(ClientModEvents.class);
@@ -65,6 +70,13 @@ public class PrimalInstinct {
             event.accept(ModItems.KHAORITE);
             event.accept(ModItems.RAW_KHAORITE);
         }
+        if(event.getTabKey() == CreativeModeTabs.BUILDING_BLOCKS) {
+            event.accept(ModBlocks.KHAORITE_BLOCK);
+        }
+        if(event.getTabKey() == CreativeModeTabs.NATURAL_BLOCKS) {
+            event.accept(ModBlocks.KHAORITE_ORE);
+        }
+
     }
 
     @SubscribeEvent
