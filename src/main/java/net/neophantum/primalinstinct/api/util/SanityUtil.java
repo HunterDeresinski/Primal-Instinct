@@ -1,12 +1,24 @@
 package net.neophantum.primalinstinct.api.util;
 
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.player.Player;
-import net.neoforged.neoforge.capabilities.CapabilityRegistry;
 import net.neoforged.neoforge.common.NeoForge;
+import net.neophantum.primalinstinct.PrimalInstinct;
+import net.neophantum.primalinstinct.api.event.MaxSanityCalcEvent;
+import net.neophantum.primalinstinct.api.event.SanityRegenCalcEvent;
 import net.neophantum.primalinstinct.api.sanity.ISanityCap;
+import net.neophantum.primalinstinct.setup.registry.CapabilityRegistry;
+import net.neophantum.primalinstinct.setup.config.ServerConfig;
+import net.neophantum.primalinstinct.api.perk.PerkAttributes;
 
 public class SanityUtil {
+
+    // Unique identifiers for attribute modifiers
+    private static final ResourceLocation MAX_SANITY_MODIFIER = PrimalInstinct.id("max_sanity_mod");
+    private static final ResourceLocation SANITY_REGEN_MODIFIER = PrimalInstinct.id("sanity_regen_mod");
+
     public static double getCurrentSanity(LivingEntity e) {
         ISanityCap sanity = CapabilityRegistry.getSanity(e);
         return sanity != null ? sanity.getCurrentSanity() : 0;
@@ -26,13 +38,21 @@ public class SanityUtil {
         rawMax += sanity.getInsightBonus() * ServerConfig.INSIGHT_SANITY_BONUS.get();
         rawMax += sanity.getExperienceTier() * ServerConfig.TIER_SANITY_BONUS.get();
 
-        // Optional: use attributes or events
-        MaxSanityCalcEvent event = new MaxSanityCalcEvent(e, (int) rawMax);
-        NeoForge.EVENT_BUS.post(event);
-        int max = event.getMax();
-        float reserve = event.getReserve();
+        var sanityAttribute = e.getAttribute(PerkAttributes.MAX_SANITY);
+        if (sanityAttribute != null) {
+            var cache = sanityAttribute.getModifier(MAX_SANITY_MODIFIER);
+            if (cache == null || cache.amount() != rawMax) {
+                if (cache != null) sanityAttribute.removeModifier(cache);
+                sanityAttribute.addTransientModifier(new AttributeModifier(MAX_SANITY_MODIFIER, rawMax, AttributeModifier.Operation.ADD_VALUE));
+            }
+            rawMax = sanityAttribute.getValue();
+        }
 
-        return new Sanity(max, reserve);
+        int max = (int) rawMax;
+
+        MaxSanityCalcEvent event = new MaxSanityCalcEvent(e, max);
+        NeoForge.EVENT_BUS.post(event);
+        return new Sanity(event.getMax(), event.getReserve());
     }
 
     public static int getMaxSanity(Player e) {
@@ -46,6 +66,16 @@ public class SanityUtil {
         double regen = ServerConfig.INIT_SANITY_REGEN.get();
         regen += sanity.getInsightBonus() * ServerConfig.INSIGHT_REGEN_BONUS.get();
         regen += sanity.getExperienceTier() * ServerConfig.TIER_REGEN_BONUS.get();
+
+        var regenAttr = e.getAttribute(PerkAttributes.SANITY_REGEN); //Possibly need to make sanity regen bonus
+        if (regenAttr != null) {
+            var cache = regenAttr.getModifier(SANITY_REGEN_MODIFIER);
+            if (cache == null || cache.amount() != regen) {
+                if (cache != null) regenAttr.removeModifier(cache);
+                regenAttr.addTransientModifier(new AttributeModifier(SANITY_REGEN_MODIFIER, regen, AttributeModifier.Operation.ADD_VALUE));
+            }
+            regen = regenAttr.getValue();
+        }
 
         SanityRegenCalcEvent event = new SanityRegenCalcEvent(e, regen);
         NeoForge.EVENT_BUS.post(event);

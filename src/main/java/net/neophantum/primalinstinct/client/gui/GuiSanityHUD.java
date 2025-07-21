@@ -16,7 +16,8 @@ public class GuiSanityHUD {
     private static final Minecraft minecraft = Minecraft.getInstance();
 
     private static final ResourceLocation BORDER = ResourceLocation.fromNamespaceAndPath(PrimalInstinct.MODID,"textures/gui/sanitybar_border.png");
-    private static final ResourceLocation FILL = new ResourceLocation.fromNamespaceAndPath(PrimalInstinct.MODID, "textures/gui/sanitybar_fill.png");
+    private static final ResourceLocation FILL = ResourceLocation.fromNamespaceAndPath(PrimalInstinct.MODID, "textures/gui/sanitybar_fill.png");
+
 
     public static void render(GuiGraphics guiGraphics, float partialTicks) {
         if (minecraft.player == null || minecraft.options.hideGui) return;
@@ -24,7 +25,7 @@ public class GuiSanityHUD {
         ISanityCap sanity = CapabilityRegistry.getSanity(minecraft.player);
         if (sanity == null || sanity.getMaxSanity() <= 0) return;
 
-        int current = sanity.getCurrentSanity();
+        int current = (int) sanity.getCurrentSanity();
         int max = sanity.getMaxSanity();
 
         int width = 100;
@@ -47,10 +48,10 @@ public class GuiSanityHUD {
 
         pose.popPose();
 
-        // Debug numbers
-        if (minecraft.options.renderDebug) {
-            String text = current + " / " + max;
-            guiGraphics.drawString(minecraft.font, text, left + width + 5, top + 1, 0xFFFFFF);
-        }
+//        // Debug numbers
+//        if (minecraft.options.renderDebug) {
+//            String text = current + " / " + max;
+//            guiGraphics.drawString(minecraft.font, text, left + width + 5, top + 1, 0xFFFFFF);
+//        }
     }
 }
