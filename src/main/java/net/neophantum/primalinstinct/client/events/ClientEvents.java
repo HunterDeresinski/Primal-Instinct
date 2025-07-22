@@ -11,13 +11,10 @@ import net.neophantum.primalinstinct.client.gui.GuiSanityHUD;
 
 @EventBusSubscriber(modid = PrimalInstinct.MODID)
 public class ClientEvents {
-
     @SubscribeEvent
-    public static void onRenderOverlay(RenderGuiLayerEvent.Pre event) {
+    public static void onRenderOverlay(RenderGuiLayerEvent.Post event) {
         if (event.getName().equals(VanillaGuiLayers.HOTBAR)) {
             GuiSanityHUD.render(event.getGuiGraphics(), ClientInfo.partialTicks);
-            event.getGuiGraphics().drawString(
-                    Minecraft.getInstance().font,"Debug render",10, 10,0xFF00FF);  // Magenta for visibility
         }
     }
 }

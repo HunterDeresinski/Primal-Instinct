@@ -1,6 +1,8 @@
 package net.neophantum.primalinstinct.api.util;
 
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.player.Player;
@@ -9,6 +11,10 @@ import net.neophantum.primalinstinct.PrimalInstinct;
 import net.neophantum.primalinstinct.api.event.MaxSanityCalcEvent;
 import net.neophantum.primalinstinct.api.event.SanityRegenCalcEvent;
 import net.neophantum.primalinstinct.api.sanity.ISanityCap;
+import net.neophantum.primalinstinct.common.capability.SanityData;
+import net.neophantum.primalinstinct.common.capability.SanityProvider;
+import net.neophantum.primalinstinct.common.network.NetworkManager;
+import net.neophantum.primalinstinct.common.network.PacketUpdateSanity;
 import net.neophantum.primalinstinct.setup.registry.CapabilityRegistry;
 import net.neophantum.primalinstinct.setup.config.ServerConfig;
 import net.neophantum.primalinstinct.api.perk.PerkAttributes;
@@ -57,6 +63,31 @@ public class SanityUtil {
 
     public static int getMaxSanity(Player e) {
         return calcMaxSanity(e).getRealMax();
+    }
+
+    public static void debugSyncSanity(ServerPlayer player) {
+        ISanityCap cap = CapabilityRegistry.getSanity(player);
+
+        if (cap == null) {
+            System.err.println("[SanityUtil] Cannot sync: capability is null");
+            return;
+        }
+
+
+        System.out.println("[SanityUtil] Preparing to sync sanity capability...");
+        System.out.println("[SanityUtil]   Instance identity hash: " + System.identityHashCode(cap));
+        System.out.println("[SanityUtil]   Current sanity: " + cap.getCurrentSanity());
+
+
+        if (!(cap instanceof SanityProvider provider)) {
+            System.err.println("[SanityUtil] Capability is not a SanityProvider. Cannot serialize.");
+            return;
+        }
+
+        CompoundTag tag = provider.serializeNBT(player.registryAccess());
+        System.out.println("[SanityUtil] Tag being sent: " + tag);
+
+        NetworkManager.sendToPlayerClient(new PacketUpdateSanity(tag), player);
     }
 
     public static double getSanityRegen(Player e) {

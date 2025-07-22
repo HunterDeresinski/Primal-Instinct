@@ -1,5 +1,8 @@
 package net.neophantum.primalinstinct.api.sanity;
 
+import net.minecraft.core.HolderLookup;
+import net.minecraft.nbt.CompoundTag;
+
 public interface ISanityCap {
     double getCurrentSanity();
     int getMaxSanity();
@@ -14,4 +17,7 @@ public interface ISanityCap {
 
     default void setInsightBonus(int bonus) {}
     default void setExperienceTier(int tier) {}
+
+    CompoundTag serializeNBT(HolderLookup.Provider provider);
+    void deserializeNBT(HolderLookup.Provider provider, CompoundTag tag);
 }

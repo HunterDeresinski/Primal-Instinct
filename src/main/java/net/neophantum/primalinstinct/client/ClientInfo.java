@@ -5,7 +5,10 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import com.mojang.blaze3d.pipeline.TextureTarget;
+import net.neophantum.primalinstinct.api.sanity.ISanityCap;
 import net.neophantum.primalinstinct.client.particle.ColorPos;
+import net.neophantum.primalinstinct.common.util.SanityTracker;
+import net.minecraft.core.HolderLookup;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,6 +39,15 @@ public class ClientInfo {
 
     public static Component[] storageTooltip = new Component[0];
 
+    private static final SanityTracker sanityTracker = new SanityTracker();
+
+    public static ISanityCap getSanityCap() {
+        return sanityTracker;
+    }
+
+    public static void updateSanityFromServer(CompoundTag tag, HolderLookup.Provider provider) {
+        sanityTracker.deserializeNBT(provider, tag);
+    }
     public static void setTooltip(Component... tooltip) {
         storageTooltip = tooltip;
     }
