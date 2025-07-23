@@ -6,10 +6,10 @@ import net.neoforged.neoforge.common.util.INBTSerializable;
 
 public class SanityData implements INBTSerializable<CompoundTag> {
 
-    private double sanity = 100;
-    private int maxSanity = 100;
-    private int insightBonus = 0;
-    private int experienceTier = 0;
+    private double sanity;
+    private int maxSanity;
+    private int insightBonus;
+    private int experienceTier;
 
     public double getSanity() {
         return sanity;

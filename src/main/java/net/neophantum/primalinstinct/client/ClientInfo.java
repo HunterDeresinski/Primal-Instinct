@@ -3,11 +3,8 @@ package net.neophantum.primalinstinct.client;
 import com.mojang.blaze3d.pipeline.TextureTarget;
 import net.minecraft.client.renderer.ShaderInstance;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.HolderLookup;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.neophantum.primalinstinct.client.particle.ColorPos;
-import net.neophantum.primalinstinct.common.capability.SanityData;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,7 +12,7 @@ import java.util.List;
 public class ClientInfo {
     private ClientInfo() {}
 
-    public static CompoundTag persistentData = new CompoundTag();
+    public static Component[] storageTooltip = new Component[0];
     public static int ticksInGame = 0;
     public static int redOverlayTicks = 0;
     public static float redOverlayMana = 0;
@@ -35,21 +32,6 @@ public class ClientInfo {
     public static ShaderInstance rainbowShader;
 
     public static boolean isSupporter = false;
-
-    public static Component[] storageTooltip = new Component[0];
-
-    // Main sanity data used by client HUDs and rendering
-    private static final SanityData sanityData = new SanityData();
-
-    // Get direct access to client-side sanity data (used like manaData in Ars)
-    public static SanityData getSanityData() {
-        return sanityData;
-    }
-
-    // Called from packet handler to sync data
-    public static void updateSanityFromServer(CompoundTag tag, HolderLookup.Provider provider) {
-        sanityData.deserializeNBT(provider, tag);
-    }
 
     public static void setTooltip(Component... tooltip) {
         storageTooltip = tooltip;

@@ -12,9 +12,10 @@ import net.neophantum.primalinstinct.client.gui.GuiSanityHUD;
 @EventBusSubscriber(modid = PrimalInstinct.MODID)
 public class ClientEvents {
     @SubscribeEvent
-    public static void onRenderOverlay(RenderGuiLayerEvent.Post event) {
-        if (event.getName().equals(VanillaGuiLayers.HOTBAR)) {
-            GuiSanityHUD.render(event.getGuiGraphics(), ClientInfo.partialTicks);
+    public static void onRenderOverlay(RenderGuiLayerEvent.Pre event) {
+        // Only draw when GUI is not hidden and the correct layer is being rendered
+        if (!Minecraft.getInstance().options.hideGui && event.getName().equals(VanillaGuiLayers.HOTBAR)) {
+            GuiSanityHUD.renderOverlay(event.getGuiGraphics(), event.getPartialTick());
         }
     }
 }
