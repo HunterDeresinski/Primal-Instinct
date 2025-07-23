@@ -5,9 +5,8 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.neophantum.primalinstinct.PrimalInstinct;
-import net.neophantum.primalinstinct.api.sanity.ISanityCap;
 import net.neophantum.primalinstinct.client.ClientInfo;
-import net.neophantum.primalinstinct.setup.registry.CapabilityRegistry;
+import net.neophantum.primalinstinct.common.capability.SanityData;
 
 public class GuiSanityHUD {
 
@@ -21,15 +20,12 @@ public class GuiSanityHUD {
     public static void render(GuiGraphics guiGraphics, float partialTicks) {
         if (mc.player == null || mc.options.hideGui) return;
 
-        ISanityCap sanity = ClientInfo.getSanityCap();
-        if (sanity == null) {
-            //System.out.println("[HUD] No sanity data available on client.");
-            return;
-        }
+        SanityData sanity = ClientInfo.getSanityData();
+        if (sanity == null) return;
 
-        double current = sanity.getCurrentSanity();
+        double current = sanity.getSanity();
         int max = sanity.getMaxSanity();
-        System.out.println("[HUD] Sanity: " + current + " / " + max);
+
         if (max <= 0) return;
 
         int screenWidth = mc.getWindow().getGuiScaledWidth();
@@ -51,8 +47,8 @@ public class GuiSanityHUD {
 
         // Draw centered sanity text
         String display = (int) current + " / " + max;
-        int textWidth = (int) (mc.font.width(display) * 0.75f);
         float textScale = 0.75f;
+        int textWidth = (int) (mc.font.width(display) * textScale);
 
         int textX = (int) ((screenWidth / 2 - textWidth / 2) / textScale);
         int textY = (int) ((top - 10) / textScale);

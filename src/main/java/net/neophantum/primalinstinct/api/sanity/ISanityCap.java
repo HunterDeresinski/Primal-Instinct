@@ -17,7 +17,4 @@ public interface ISanityCap {
 
     default void setInsightBonus(int bonus) {}
     default void setExperienceTier(int tier) {}
-
-    CompoundTag serializeNBT(HolderLookup.Provider provider);
-    void deserializeNBT(HolderLookup.Provider provider, CompoundTag tag);
 }

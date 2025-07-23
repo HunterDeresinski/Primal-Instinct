@@ -3,13 +3,16 @@ package net.neophantum.primalinstinct.common.capability;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.neoforged.neoforge.common.util.INBTSerializable;
+import org.jetbrains.annotations.UnknownNullability;
 
-public class SanityData implements INBTSerializable<CompoundTag> {
+public class ANPlayerData implements INBTSerializable<CompoundTag> {
 
-    private double sanity = 100;
+    private double sanity = 100.0;
     private int maxSanity = 100;
     private int insightBonus = 0;
     private int experienceTier = 0;
+
+    // === Getters & Setters ===
 
     public double getSanity() {
         return sanity;
@@ -25,9 +28,7 @@ public class SanityData implements INBTSerializable<CompoundTag> {
 
     public void setMaxSanity(int maxSanity) {
         this.maxSanity = maxSanity;
-        if (sanity > maxSanity) {
-            sanity = maxSanity;
-        }
+        if (sanity > maxSanity) sanity = maxSanity;
     }
 
     public int getInsightBonus() {
@@ -46,8 +47,10 @@ public class SanityData implements INBTSerializable<CompoundTag> {
         this.experienceTier = experienceTier;
     }
 
+    // === Serialization ===
+
     @Override
-    public CompoundTag serializeNBT(HolderLookup.Provider provider) {
+    public @UnknownNullability CompoundTag serializeNBT(HolderLookup.Provider provider) {
         CompoundTag tag = new CompoundTag();
         tag.putDouble("Sanity", sanity);
         tag.putInt("MaxSanity", maxSanity);
@@ -58,9 +61,9 @@ public class SanityData implements INBTSerializable<CompoundTag> {
 
     @Override
     public void deserializeNBT(HolderLookup.Provider provider, CompoundTag tag) {
-        this.sanity = tag.getDouble("Sanity");
-        this.maxSanity = tag.getInt("MaxSanity");
-        this.insightBonus = tag.getInt("InsightBonus");
-        this.experienceTier = tag.getInt("ExperienceTier");
+        sanity = tag.getDouble("Sanity");
+        maxSanity = tag.getInt("MaxSanity");
+        insightBonus = tag.getInt("InsightBonus");
+        experienceTier = tag.getInt("ExperienceTier");
     }
 }

@@ -1,14 +1,13 @@
 package net.neophantum.primalinstinct.client;
 
+import com.mojang.blaze3d.pipeline.TextureTarget;
 import net.minecraft.client.renderer.ShaderInstance;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
-import com.mojang.blaze3d.pipeline.TextureTarget;
-import net.neophantum.primalinstinct.api.sanity.ISanityCap;
 import net.neophantum.primalinstinct.client.particle.ColorPos;
-import net.neophantum.primalinstinct.common.util.SanityTracker;
-import net.minecraft.core.HolderLookup;
+import net.neophantum.primalinstinct.common.capability.SanityData;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,15 +38,19 @@ public class ClientInfo {
 
     public static Component[] storageTooltip = new Component[0];
 
-    private static final SanityTracker sanityTracker = new SanityTracker();
+    // Main sanity data used by client HUDs and rendering
+    private static final SanityData sanityData = new SanityData();
 
-    public static ISanityCap getSanityCap() {
-        return sanityTracker;
+    // Get direct access to client-side sanity data (used like manaData in Ars)
+    public static SanityData getSanityData() {
+        return sanityData;
     }
 
+    // Called from packet handler to sync data
     public static void updateSanityFromServer(CompoundTag tag, HolderLookup.Provider provider) {
-        sanityTracker.deserializeNBT(provider, tag);
+        sanityData.deserializeNBT(provider, tag);
     }
+
     public static void setTooltip(Component... tooltip) {
         storageTooltip = tooltip;
     }

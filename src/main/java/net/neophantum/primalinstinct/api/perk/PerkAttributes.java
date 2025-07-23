@@ -35,10 +35,12 @@ public class PerkAttributes {
 
     @SubscribeEvent
     public static void modifyEntityAttributes(EntityAttributeModificationEvent event) {
-        event.getTypes().stream().filter(type -> type == EntityType.PLAYER).forEach(type -> {
-            ATTRIBUTES.getEntries().forEach(attr -> {
-                event.add(type, attr);
-            });
-        });
+        event.getTypes().stream()
+                .filter(e -> e == EntityType.PLAYER)
+                .forEach(e -> {
+                    ATTRIBUTES.getEntries().forEach(v -> {
+                        event.add(e, v);
+                    });
+                });
     }
 }
