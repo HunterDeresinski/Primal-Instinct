@@ -16,7 +16,7 @@ public class ClientInfo {
     public static int ticksInGame = 0;
     public static int redOverlayTicks = 0;
     public static float redOverlayMana = 0;
-    public static float reservedOverlayMana = 0.15F;
+    public static float reservedOverlaySanity = 0.15F;
 
     public static float partialTicks = 0.0f;
     public static float deltaTicks = 0;

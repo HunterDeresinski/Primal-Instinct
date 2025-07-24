@@ -10,6 +10,7 @@ import net.neophantum.primalinstinct.PrimalInstinct;
 import net.neophantum.primalinstinct.api.sanity.ISanityCap;
 import net.neophantum.primalinstinct.client.ClientInfo;
 import net.neophantum.primalinstinct.common.capability.SanityData;
+import net.neophantum.primalinstinct.setup.registry.CapabilityRegistry;
 
 public class PacketSyncSanityCap extends AbstractPacket {
 
@@ -32,8 +33,11 @@ public class PacketSyncSanityCap extends AbstractPacket {
     // Client-side logic
     @Override
     public void onClientReceived(Minecraft minecraft, Player player) {
-        ClientInfo.updateSanityFromServer(tag, player.registryAccess());
-        System.out.println("[PacketSyncSanityCap] Synced sanity from server tag: " + tag);
+        ISanityCap sanity = CapabilityRegistry.getSanity(player);
+        if (sanity instanceof SanityData data) {
+            data.deserializeNBT(player.registryAccess(), tag);
+            System.out.println("[PacketSyncSanityCap] Synced sanity from server: " + tag);
+        }
     }
 
     public static final CustomPacketPayload.Type<PacketSyncSanityCap> TYPE =

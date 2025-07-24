@@ -11,6 +11,7 @@ import net.minecraft.util.Mth;
 import net.neophantum.primalinstinct.PrimalInstinct;
 import net.neophantum.primalinstinct.api.sanity.ISanityCap;
 import net.neophantum.primalinstinct.client.ClientInfo;
+import net.neophantum.primalinstinct.client.gui.utils.RenderUtils;
 import net.neophantum.primalinstinct.common.capability.SanityData;
 import net.neophantum.primalinstinct.setup.registry.CapabilityRegistry;
 
@@ -28,7 +29,16 @@ public class GuiSanityHUD {
         if (mc.player == null || mc.options.hideGui) return false;
 
         ISanityCap sanityCap = CapabilityRegistry.getSanity(mc.player);
-        if (sanityCap == null) return false;
+        if (sanityCap == null) {
+            PrimalInstinct.LOGGER.warn("[HUD] ClientInfo.getSanity() is null!");
+            return false;
+        }
+
+        //debugging purposes
+        //double current = sanityCap.getCurrentSanity();
+        //double max = sanityCap.getMaxSanity();
+
+        //PrimalInstinct.LOGGER.info("[HUD] Checking bar display: {} / {}", current, max);
 
         boolean isLowSanity = sanityCap.getCurrentSanity() < sanityCap.getMaxSanity();
         return sanityCap.getMaxSanity() > 0 && isLowSanity;
@@ -48,27 +58,39 @@ public class GuiSanityHUD {
         int screenWidth = mc.getWindow().getGuiScaledWidth();
         int screenHeight = mc.getWindow().getGuiScaledHeight();
 
-        int offsetLeft = 10;
-        int barWidth = 96;
-        int barHeight = 6;
-        int filledWidth = (int) (barWidth * (current / (max * (1.0 + ClientInfo.reservedOverlayMana))));
-        int yOffset = screenHeight - 28;
 
-        guiGraphics.blit(BORDER, offsetLeft, yOffset - 9, 0, 0, 108, 18, 256, 256);
+        int borderWidth = 56;
+        int borderHeight = 17;
+        int fillWidth = 48;
+        int fillHeight = 6;
+        int borderXOffset = (screenWidth - borderWidth) / 2 - 6;
+        int borderYOffset = screenHeight - 60;
+
+        // seperating them for now to see if they need to be seperate though this is very possibly redundant
+        int fillXOffset = (screenWidth - borderWidth) / 2 + 5 - 6;
+        int fillYOffset = screenHeight - 51;
+        int filledWidth = (int) (fillWidth * (current / (max * (1.0 + ClientInfo.reservedOverlaySanity))));
+
+        // update GUI later so that way the animation works from this sanityOffset
 
         int sanityOffset = (int) (((ClientInfo.ticksInGame + deltaTracker.getGameTimeDeltaTicks()) / 3 % (33))) * 6;
-        guiGraphics.blit(FILL, offsetLeft + 9, yOffset, 0, sanityOffset, filledWidth, barHeight, 256, 256);
+        guiGraphics.blit(FILL, fillXOffset + 9, fillYOffset, 0, 0/*sanityOffset*/, filledWidth, fillHeight, fillWidth, fillHeight);
 
-        renderRedOverlay(poseStack, offsetLeft, yOffset, sanityOffset, max);
-        renderReserveOverlay(poseStack, offsetLeft, yOffset, sanityOffset, max);
+        //renderRedOverlay(poseStack, offsetLeft, yOffset, sanityOffset, max);
+        //renderReserveOverlay(poseStack, offsetLeft, yOffset, sanityOffset, max);
 
         String display = (int) current + " / " + max;
         int maxWidth = mc.font.width(display);
-        int offset = 67 - maxWidth / 2;
-        guiGraphics.drawString(mc.font, display, offset, yOffset - 10, 0xFFFFFF);
+        int sanityTextXOffset = (screenWidth - borderWidth) / 2;
+        int sanityTextYOffset = screenHeight - 70;
 
-        guiGraphics.blit(BORDER, offsetLeft, yOffset - 8, 0, 18, 108, 20, 256, 256);
+        guiGraphics.drawString(mc.font, display, sanityTextXOffset, sanityTextYOffset, 0xFFFFFF);
+
+        guiGraphics.blit(BORDER, borderXOffset, borderYOffset, 0, 0, borderWidth, borderHeight, borderWidth, borderHeight);
     }
+
+    // possibly not using. This is for phasing into different color bars based on amount of sanity. Needs further work/understanding
+    // as I essentially just ripped this from Ars code and need to further understand it before full implementation.
 
     public static void renderRedOverlay(PoseStack poseStack, int offsetLeft, int yOffset, int sanityOffset, int maxSanity) {
         if (!ClientInfo.redTicks()) return;
@@ -78,8 +100,8 @@ public class GuiSanityHUD {
     }
 
     public static void renderReserveOverlay(PoseStack poseStack, int offsetLeft, int yOffset, int sanityOffset, int maxSanity) {
-        if (ClientInfo.reservedOverlayMana <= 0) return;
-        int reserveLength = (int) (96F * ClientInfo.reservedOverlayMana);
+        if (ClientInfo.reservedOverlaySanity <= 0) return;
+        int reserveLength = (int) (96F * ClientInfo.reservedOverlaySanity);
         int offset = 96 - reserveLength;
         RenderSystem.setShaderTexture(0, FILL);
         guiColorBlit(poseStack, offsetLeft + 9 + offset, yOffset, 0, sanityOffset, reserveLength, 6, 256, 256, 0x232323);
@@ -91,7 +113,7 @@ public class GuiSanityHUD {
         float g = ((color >> 8) & 0xFF) / 255f;
         float b = (color & 0xFF) / 255f;
         RenderSystem.setShaderColor(r, g, b, a);
-        GuiGraphics.blit(poseStack, x, y, u, v, width, height, texW, texH);
+        RenderUtils.colorBlit(poseStack, x, y, u, v, width, height, texW, texH, new Color(r, g, b, a));
         RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
     }
 }

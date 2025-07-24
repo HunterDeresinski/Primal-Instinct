@@ -3,6 +3,7 @@ package net.neophantum.primalinstinct.common.capability;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.LivingEntity;
+import net.neophantum.primalinstinct.PrimalInstinct;
 import net.neophantum.primalinstinct.api.sanity.ISanityCap;
 import net.neophantum.primalinstinct.common.network.NetworkManager;
 import net.neophantum.primalinstinct.common.network.PacketUpdateSanity;
@@ -16,6 +17,23 @@ public class SanityCap implements ISanityCap {
     public SanityCap(LivingEntity entity) {
         this.entity = entity;
         this.sanityData = entity.getData(AttachmentRegistry.SANITY_ATTACHMENT);
+        //PrimalInstinct.LOGGER.info("[SanityCap] Constructed for: " + entity.getName().getString() +
+        //        ", has sanityData? " + (this.sanityData != null));
+
+        if (this.sanityData == null && entity.level().isClientSide()) {
+            this.sanityData = new SanityData(); // Prevent NPE on client before sync
+            //PrimalInstinct.LOGGER.warn("[SanityCap] sanityData was null on CLIENT — instantiating fallback!");
+        }
+
+        // Most likely changing this later. I cannot seem to find where Ars initializes this. REMEMBER TO LOOK INTO THAT!
+        if (this.sanityData != null && this.sanityData.getMaxSanity() <= 0) {
+            this.sanityData.setMaxSanity(100);
+            this.sanityData.setSanity(100);
+        }
+    }
+
+    private SanityData getDataSafe() {
+        return sanityData != null ? sanityData : new SanityData();
     }
 
     @Override
@@ -79,6 +97,7 @@ public class SanityCap implements ISanityCap {
     }
 
     public void syncToClient(ServerPlayer player) {
+        PrimalInstinct.LOGGER.info("[SYNC] Sending sanity to client: {}", player.getName().getString());
         CompoundTag tag = sanityData.serializeNBT(player.registryAccess());
         NetworkManager.sendToPlayerClient(new PacketUpdateSanity(tag), player);
     }

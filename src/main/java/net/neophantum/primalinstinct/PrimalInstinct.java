@@ -17,6 +17,7 @@ import net.neophantum.primalinstinct.block.ModBlocks;
 import net.neophantum.primalinstinct.common.network.NetworkManager;
 import net.neophantum.primalinstinct.item.ModCreativeModeTabs;
 import net.neophantum.primalinstinct.item.ModItems;
+import net.neophantum.primalinstinct.setup.registry.AttachmentRegistry;
 import org.slf4j.Logger;
 
 @Mod(PrimalInstinct.MODID)
@@ -27,6 +28,8 @@ public class PrimalInstinct {
     public PrimalInstinct(IEventBus modEventBus, ModContainer modContainer) {
         // Register configuration
         modContainer.registerConfig(ModConfig.Type.COMMON, Config.SPEC);
+
+        AttachmentRegistry.ATTACHMENT_TYPES.register(modEventBus);
 
         // Register items, blocks, creative tabs
         ModCreativeModeTabs.register(modEventBus);
