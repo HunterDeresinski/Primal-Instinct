@@ -2,6 +2,7 @@ package net.neophantum.primalinstinct.client.events;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.PostChain;
+import net.minecraft.client.renderer.PostPass;
 import net.minecraft.resources.ResourceLocation;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
@@ -14,12 +15,15 @@ import net.neophantum.primalinstinct.client.ClientInfo;
 import net.neophantum.primalinstinct.client.gui.GuiSanityHUD;
 import net.neophantum.primalinstinct.setup.registry.CapabilityRegistry;
 
+import javax.annotation.Nullable;
 import java.io.IOException;
+import java.util.List;
 
 @EventBusSubscriber(modid = PrimalInstinct.MODID)
 public class ClientEvents {
 
     private static PostChain postShader;
+    private static PostPass sanityPass;
 
     @SubscribeEvent
     public static void onRenderOverlay(RenderGuiLayerEvent.Pre event) {
@@ -32,17 +36,31 @@ public class ClientEvents {
         }
     }
 
+    @Nullable
+    private static PostPass getFirstPass(PostChain chain) {
+        try {
+            var field = PostChain.class.getDeclaredField("passes");
+            field.setAccessible(true);
+            @SuppressWarnings("unchecked")
+            List<PostPass> passes = (List<PostPass>) field.get(chain);
+            return passes.isEmpty() ? null : passes.get(0);
+        } catch (Exception e) {
+            PrimalInstinct.LOGGER.error("Failed to reflectively access PostPass list", e);
+            return null;
+        }
+    }
+
     // Working on making world turn grayscale as sanity drops
-    /*
     @SubscribeEvent
     public static void onRenderTick(RenderLevelStageEvent event) {
         if (event.getStage() != RenderLevelStageEvent.Stage.AFTER_SKY) return;
 
         Minecraft mc = Minecraft.getInstance();
 
+        // Initialize shader only once
         if (postShader == null) {
             try {
-                ResourceLocation shaderLoc = ResourceLocation.fromNamespaceAndPath(PrimalInstinct.MODID, "shaders/post/sanity.json");
+                ResourceLocation shaderLoc = ResourceLocation.fromNamespaceAndPath(PrimalInstinct.MODID, "shaders/post/desaturate.json");
                 postShader = new PostChain(
                         mc.getTextureManager(),
                         mc.getResourceManager(),
@@ -50,6 +68,12 @@ public class ClientEvents {
                         shaderLoc
                 );
                 postShader.resize(mc.getWindow().getWidth(), mc.getWindow().getHeight());
+
+                // Use reflection to get the first shader pass from the JSON-defined shader
+                sanityPass = getFirstPass(postShader);
+
+                PrimalInstinct.LOGGER.info("Sanity shader loaded successfully with {} passes", postShader.getName());
+
             } catch (IOException e) {
                 PrimalInstinct.LOGGER.error("Failed to load sanity shader", e);
             }
@@ -58,17 +82,17 @@ public class ClientEvents {
         if (postShader != null) {
             ISanityCap sanity = CapabilityRegistry.getSanity(mc.player);
             float ratio = sanity != null
-                    ? (float) (sanity.getCurrentSanity() / sanity.getMaxSanity())
+                    ? (float)(sanity.getCurrentSanity() / Math.max(1.0, sanity.getMaxSanity()))
                     : 1.0f;
 
-            // Set uniform on first pass of the shader
-            if (!postShader.passes.isEmpty()) {
-                postShader.passes.get(0).getUniform("SanityRatio").set(ratio);
+            // Set the SanityRatio uniform on the stored pass
+            if (sanityPass != null) {
+                sanityPass.getEffect().getUniform("SanityRatio").set(ratio);
             }
 
-            postShader.process(event.getPartialTick());
+            postShader.process(event.getPartialTick().getGameTimeDeltaPartialTick(true));
         }
     }
-     */
+
 }
 

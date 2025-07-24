@@ -1,9 +1,9 @@
 uniform sampler2D DiffuseSampler;
-uniform float SanityRatio; // 1.0 = full sanity, 0.0 = no sanity
+uniform float SanityRatio;
 
 vec4 applyGrayscale(vec4 color, float intensity) {
     float gray = dot(color.rgb, vec3(0.299, 0.587, 0.114));
-    return mix(color, vec4(gray, gray, gray, color.a), 1.0 - intensity);
+    return mix(vec4(gray, gray, gray, color.a), color, intensity); // fade to gray as SanityRatio → 0
 }
 
 void main() {

@@ -4,7 +4,7 @@
     {
       "name": "desaturate",
       "intarget": "minecraft:main",
-      "outtarget": "swap",
+      "outtarget": "minecraft:main",
       "auxtargets": [],
       "uniforms": [
         {
