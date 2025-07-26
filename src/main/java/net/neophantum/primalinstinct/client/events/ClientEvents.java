@@ -60,7 +60,7 @@ public class ClientEvents {
         // Initialize shader only once
         if (postShader == null) {
             try {
-                ResourceLocation shaderLoc = ResourceLocation.fromNamespaceAndPath(PrimalInstinct.MODID, "shaders/post/desaturate.json");
+                ResourceLocation shaderLoc = ResourceLocation.fromNamespaceAndPath(PrimalInstinct.MODID, "post_effect/desaturate.json");
                 postShader = new PostChain(
                         mc.getTextureManager(),
                         mc.getResourceManager(),
@@ -72,10 +72,12 @@ public class ClientEvents {
                 // Use reflection to get the first shader pass from the JSON-defined shader
                 sanityPass = getFirstPass(postShader);
 
-                PrimalInstinct.LOGGER.info("Sanity shader loaded successfully with {} passes", postShader.getName());
+                //PrimalInstinct.LOGGER.info("Attempting to load shader from: {}", shaderLoc);
+                //PrimalInstinct.LOGGER.info("Sanity shader loaded successfully with {} passes", postShader.getName());
+
 
             } catch (IOException e) {
-                PrimalInstinct.LOGGER.error("Failed to load sanity shader", e);
+                //PrimalInstinct.LOGGER.error("Failed to load sanity shader", e);
             }
         }
 

@@ -1,5 +1,8 @@
 uniform sampler2D DiffuseSampler;
-uniform float SanityRatio;
+
+layout(std140) uniform SanityBlock {
+    float SanityRatio;
+};
 
 vec4 applyGrayscale(vec4 color, float intensity) {
     float gray = dot(color.rgb, vec3(0.299, 0.587, 0.114));

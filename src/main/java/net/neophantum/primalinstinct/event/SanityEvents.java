@@ -40,8 +40,8 @@ public class SanityEvents {
             int blockLight = level.getBrightness(LightLayer.BLOCK, player.blockPosition());
             int totalLight = Math.max(skyLight, blockLight);
 
-            PrimalInstinct.LOGGER.info("[Sanity] Light at {}: Sky={}, Block={}, Using={}",
-                    player.blockPosition(), skyLight, blockLight, totalLight);
+            //PrimalInstinct.LOGGER.info("[Sanity] Light at {}: Sky={}, Block={}, Using={}",
+            //        player.blockPosition(), skyLight, blockLight, totalLight);
 
             // Constants you can tweak
             final int LIGHT_THRESHOLD = 7; // Neutral point — below = lose, above = gain

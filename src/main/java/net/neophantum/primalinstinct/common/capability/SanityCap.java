@@ -97,7 +97,7 @@ public class SanityCap implements ISanityCap {
     }
 
     public void syncToClient(ServerPlayer player) {
-        PrimalInstinct.LOGGER.info("[SYNC] Sending sanity to client: {}", player.getName().getString());
+        //PrimalInstinct.LOGGER.info("[SYNC] Sending sanity to client: {}", player.getName().getString());
         CompoundTag tag = sanityData.serializeNBT(player.registryAccess());
         NetworkManager.sendToPlayerClient(new PacketUpdateSanity(tag), player);
     }

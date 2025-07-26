@@ -36,7 +36,7 @@ public class PacketSyncSanityCap extends AbstractPacket {
         ISanityCap sanity = CapabilityRegistry.getSanity(player);
         if (sanity instanceof SanityData data) {
             data.deserializeNBT(player.registryAccess(), tag);
-            System.out.println("[PacketSyncSanityCap] Synced sanity from server: " + tag);
+            //System.out.println("[PacketSyncSanityCap] Synced sanity from server: " + tag);
         }
     }
 

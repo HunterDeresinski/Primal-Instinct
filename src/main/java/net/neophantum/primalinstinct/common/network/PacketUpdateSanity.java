@@ -33,7 +33,7 @@ public class PacketUpdateSanity extends AbstractPacket {
 
     @Override
     public void onClientReceived(Minecraft minecraft, Player player) {
-        PrimalInstinct.LOGGER.info("[PACKET] Received sanity update on client");
+        //PrimalInstinct.LOGGER.info("[PACKET] Received sanity update on client");
         SanityData data = new SanityData();
         data.deserializeNBT(player.registryAccess(), this.tag);
         player.setData(AttachmentRegistry.SANITY_ATTACHMENT, data);

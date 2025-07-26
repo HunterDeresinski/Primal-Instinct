@@ -1,16 +1,17 @@
 {
-  "targets": ["swap"],
+  "targets": ["minecraft:main"],
   "passes": [
     {
       "name": "desaturate",
       "intarget": "minecraft:main",
       "outtarget": "minecraft:main",
-      "auxtargets": [],
+      "vertex_shader": "primalinstinct:shaders/program/desaturate",
+      "fragment_shader": "primalinstinct:shaders/program/desaturate",
       "uniforms": [
         {
           "name": "SanityRatio",
           "type": "float",
-          "values": [1.0]
+          "value": 1.0
         }
       ]
     }

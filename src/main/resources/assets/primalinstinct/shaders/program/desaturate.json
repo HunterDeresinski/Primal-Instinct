@@ -1,0 +1,4 @@
+{
+  "vertex": "shaders/program/desaturate.vsh",
+  "fragment": "shaders/program/desaturate.fsh"
+}
