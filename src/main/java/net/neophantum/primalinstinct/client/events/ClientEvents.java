@@ -1,9 +1,11 @@
 package net.neophantum.primalinstinct.client.events;
 
+import com.mojang.blaze3d.shaders.Uniform;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.PostChain;
 import net.minecraft.client.renderer.PostPass;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.Mth;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.event.RenderGuiLayerEvent;
@@ -57,10 +59,10 @@ public class ClientEvents {
 
         Minecraft mc = Minecraft.getInstance();
 
-        // Initialize shader only once
         if (postShader == null) {
             try {
-                ResourceLocation shaderLoc = ResourceLocation.fromNamespaceAndPath(PrimalInstinct.MODID, "post_effect/desaturate.json");
+                ResourceLocation shaderLoc = ResourceLocation.fromNamespaceAndPath(PrimalInstinct.MODID, "shaders/post/desaturate.json");
+
                 postShader = new PostChain(
                         mc.getTextureManager(),
                         mc.getResourceManager(),
@@ -69,15 +71,11 @@ public class ClientEvents {
                 );
                 postShader.resize(mc.getWindow().getWidth(), mc.getWindow().getHeight());
 
-                // Use reflection to get the first shader pass from the JSON-defined shader
                 sanityPass = getFirstPass(postShader);
 
-                //PrimalInstinct.LOGGER.info("Attempting to load shader from: {}", shaderLoc);
-                //PrimalInstinct.LOGGER.info("Sanity shader loaded successfully with {} passes", postShader.getName());
-
-
+                PrimalInstinct.LOGGER.info("Shader loaded: {}", shaderLoc);
             } catch (IOException e) {
-                //PrimalInstinct.LOGGER.error("Failed to load sanity shader", e);
+                PrimalInstinct.LOGGER.error("Failed to load sanity shader", e);
             }
         }
 
@@ -87,13 +85,20 @@ public class ClientEvents {
                     ? (float)(sanity.getCurrentSanity() / Math.max(1.0, sanity.getMaxSanity()))
                     : 1.0f;
 
-            // Set the SanityRatio uniform on the stored pass
             if (sanityPass != null) {
-                sanityPass.getEffect().getUniform("SanityRatio").set(ratio);
+                Uniform desaturation = sanityPass.getEffect().getUniform("Desaturation");
+                if (desaturation != null) {
+                    float value = Mth.clamp(1.0f - ratio, 0.0f, 1.0f);
+                    desaturation.set(value);
+                    PrimalInstinct.LOGGER.info("Set Desaturation uniform to {}", value);
+                } else {
+                    PrimalInstinct.LOGGER.warn("Sanity shader missing 'Desaturation' uniform");
+                }
             }
 
             postShader.process(event.getPartialTick().getGameTimeDeltaPartialTick(true));
         }
     }
+
 
 }
